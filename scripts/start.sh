@@ -64,7 +64,17 @@ fi
 sudo mkdir -p "${STATE_DIR}"
 sudo mount /dev/sdf "${STATE_DIR}"
 
+# Create a application user
+sudo adduser "${APPLICATION_USER}"
+
+# Setup a server directory
+mkdir -p "${SERVER_DIR}"
+chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}"
+
 # Link stateful files and directories
+# TODO: Store server-icon in this repo and use cloud-init's write_files to
+# write it to the server directory
+ln -s "${STATE_DIR}/server-icon.png" "${SERVER_DIR}/server-icon.png"
 ln -s "${STATE_DIR}/world" "${SERVER_DIR}/world"
 ln -s "${STATE_DIR}/logs" "${SERVER_DIR}/logs"
 ln -s "${STATE_DIR}/config" "${SERVER_DIR}/config"
@@ -73,19 +83,15 @@ ln -s "${STATE_DIR}/banned-ips.json" "${SERVER_DIR}/banned-ips.json"
 ln -s "${STATE_DIR}/banned-players.json" "${SERVER_DIR}/banned-players.json"
 ln -s "${STATE_DIR}/ops.json" "${SERVER_DIR}/ops.json"
 
-# Create a application user
-sudo adduser "${APPLICATION_USER}"
-
-# Setup a server directory
-mkdir -p "${SERVER_DIR}"
-chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}"
-
-# Install Amazon's java runtime
-sudo yum install -y java-21-amazon-corretto-headless
-
-# Download the server jar
-curl -o "${JAR_PATH}" -OJ "${DOWNLOAD_LOCATION}"
-check_the_sum "${JAR_PATH}" "${SERVER_JAR_CHECKSUM}"
+cat <<EOF > "${SERVER_DIR}/allowed_symlinks.txt"
+${STATE_DIR}/world
+${STATE_DIR}/logs
+${STATE_DIR}/config
+${STATE_DIR}/whitelist.json
+${STATE_DIR}/banned-ips.json
+${STATE_DIR}/banned-players.json
+${STATE_DIR}/ops.json
+EOF
 
 cat <<EOF > "${SERVER_DIR}/eula.txt"
 eula=true
@@ -160,9 +166,16 @@ EOF
 # issues but I saw a warning in the logs while spinning this fella up
 chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.properties"
 
+# Install Amazon's java runtime
+sudo yum install -y java-21-amazon-corretto-headless
+
+# Download the server jar
+curl -o "${JAR_PATH}" -OJ "${DOWNLOAD_LOCATION}"
+check_the_sum "${JAR_PATH}" "${SERVER_JAR_CHECKSUM}"
 
 # Now for modifications!
 
+mkdir -p "${SERVER_DIR}/mods"
 download_mod "https://cdn.modrinth.com/data/P7dR8mSH/versions/qKPgBeHl/fabric-api-0.104.0%2B1.21.1.jar" "b1aeaf90a9af7b5fd4069147bfb8b5bd4c66e4756248ae12fed776e2da694a1a"
 download_mod "https://cdn.modrinth.com/data/gvQqBUqZ/versions/5szYtenV/lithium-fabric-mc1.21.1-0.13.0.jar" "10d371fee397bf0306e1e2d863c54c56442bcc2dc6e01603f1469f2fe4910d61"
 download_mod "https://cdn.modrinth.com/data/KOHu7RCS/versions/Kxy5mXbm/Moonrise-Fabric-0.1.0-beta.2%2B44f8058.jar" "dfee191fbb525d0af10893aff55da02ee96e91d9e337b9eca75dc9724679a4b5"
