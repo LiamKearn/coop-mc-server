@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -xe
 
 # ========================================================
 # START FUNCTIONS
@@ -8,13 +8,13 @@ set -e
 check_the_sum() {
     FILE=$1
     EXPECTED=$2
-    ACTUAL=$(sha256sum $FILE | cut -d ' ' -f 1)
+    ACTUAL=$(sha256sum "${FILE}" | cut -d ' ' -f 1)
     echo "Checking the of ${FILE}"
     echo "Expected: ${EXPECTED}"
     echo "Actual: ${ACTUAL}"
     if [ "$EXPECTED" != "$ACTUAL" ]; then
         echo "Checksum of ${FILE} does not match expected checksum, exiting"
-        rm -f $FILE
+        rm -f "${FILE}"
         exit 1
     fi
     echo "Checksum matches!"
@@ -23,8 +23,17 @@ check_the_sum() {
 download_mod() {
     URL=$1
     CHECKSUM=$2
-    curl --output-dir "${SERVER_DIR}/mods" -OJ "${URL}"
-    check_the_sum "${SERVER_DIR}/mods/$(basename $URL)" "${CHECKSUM}"
+    FORCE_FILENAME=$3
+    if [ -n "$FORCE_FILENAME" ]; then
+        DOWNLOADED_PATH="${SERVER_DIR}/mods/${FORCE_FILENAME}"
+        echo "Forcing output to ${DOWNLOADED_PATH}"
+        curl -o "${DOWNLOADED_PATH}" -sSOJ "${URL}"
+    else
+        echo "Not forcing output name"
+        DOWNLOADED_PATH=$(curl --output-dir "${SERVER_DIR}/mods" -sSOJ "${URL}" -w "%{filename_effective}\n" )
+    fi
+    echo "Downloaded mod to ${DOWNLOADED_PATH}"
+    check_the_sum "${DOWNLOADED_PATH}" "${CHECKSUM}"
 }
 
 # ========================================================
@@ -56,13 +65,17 @@ STATE_DIR="/home/${APPLICATION_USER}/mcstate"
 
 # Mount the state EBS volume
 # Test if there is an existing filesystem on the volume, if not mkfs.ext4 one.
-# partprobe -d -s /dev/sdb
-if [ $(partprobe -d -s /dev/sdf | grep -q '(no output)') ]; then
+if partprobe -d -s /dev/sdf | grep -q '(no output)' || false
+then
     echo "No filesystem detected on /dev/sdf, creating one"
     sudo mkfs.ext4 /dev/sdf
 fi
 sudo mkdir -p "${STATE_DIR}"
-sudo mount /dev/sdf "${STATE_DIR}"
+# sudo mount /dev/sdf "${STATE_DIR}" -o nofail
+sudo cat >> /etc/fstab <<EOF
+/dev/sdf ${STATE_DIR} ext4 defaults,nofail 0 2
+EOF
+sudo mount -a
 
 # Create a application user
 sudo adduser "${APPLICATION_USER}"
@@ -174,13 +187,17 @@ curl -o "${JAR_PATH}" -OJ "${DOWNLOAD_LOCATION}"
 check_the_sum "${JAR_PATH}" "${SERVER_JAR_CHECKSUM}"
 
 # Now for modifications!
-
 mkdir -p "${SERVER_DIR}/mods"
 download_mod "https://cdn.modrinth.com/data/P7dR8mSH/versions/qKPgBeHl/fabric-api-0.104.0%2B1.21.1.jar" "b1aeaf90a9af7b5fd4069147bfb8b5bd4c66e4756248ae12fed776e2da694a1a"
 download_mod "https://cdn.modrinth.com/data/gvQqBUqZ/versions/5szYtenV/lithium-fabric-mc1.21.1-0.13.0.jar" "10d371fee397bf0306e1e2d863c54c56442bcc2dc6e01603f1469f2fe4910d61"
 download_mod "https://cdn.modrinth.com/data/KOHu7RCS/versions/Kxy5mXbm/Moonrise-Fabric-0.1.0-beta.2%2B44f8058.jar" "dfee191fbb525d0af10893aff55da02ee96e91d9e337b9eca75dc9724679a4b5"
 download_mod "https://cdn.modrinth.com/data/fALzjamp/versions/dPliWter/Chunky-1.4.16.jar" "c9f03e322e631ee94ccb8dbf3776859cd12766e513b7533e9f966e799db47937"
 download_mod "https://cdn.modrinth.com/data/s86X568j/versions/uT1cdd3k/ChunkyBorder-1.2.18.jar" "0a4066b36603e1d91fe7d11cce8e2eb066c668828889c866ce08d1baf469f351"
+# SEE: https://download.geysermc.org/v2/projects/geyser/versions/latest for a list of versions
+# SEE: https://github.com/GeyserMC/GeyserWebsite/blob/master/openapi/downloads.json for API spec
+# Geyser returns a UTF8 filename content-disposition header, which is not supported by curl, we need to manually specifiy the filename here.
+download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.2/builds/674/downloads/fabric" "11d0f8be6984d64d6d0ab10c895e3982018d34f588c4e259af716fdd0a608a6b" "Geyser-Fabric.jar"
+download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 
 # Start the minecraft server as the application user running in a named screen session
 su - "${APPLICATION_USER}" -c "cd ${SERVER_DIR} && screen -S mc -d -m java -jar ${JAR_NAME} nogui"
