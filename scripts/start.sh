@@ -210,7 +210,7 @@ download_mod "https://cdn.modrinth.com/data/s86X568j/versions/uT1cdd3k/ChunkyBor
 # SEE: https://download.geysermc.org/v2/projects/geyser/versions/latest for a list of versions
 # SEE: https://github.com/GeyserMC/GeyserWebsite/blob/master/openapi/downloads.json for API spec
 # Geyser returns a UTF8 filename content-disposition header, which is not supported by curl, we need to manually specifiy the filename here.
-download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.2/builds/674/downloads/fabric" "11d0f8be6984d64d6d0ab10c895e3982018d34f588c4e259af716fdd0a608a6b" "Geyser-Fabric.jar"
+download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/builds/676/downloads/fabric" "cfb15ad7c1b938af8ad96554d2764549f66899262cc3579fdcdbc94bcc5400a5" "Geyser-Fabric.jar"
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 
 # Start the minecraft server as the application user running in a named screen session
