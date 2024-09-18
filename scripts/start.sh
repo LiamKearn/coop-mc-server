@@ -178,7 +178,7 @@ spawn-protection=0
 sync-chunk-writes=true
 text-filtering-config=
 use-native-transport=true
-view-distance=10
+view-distance=16
 white-list=true
 EOF
 # Something seems to want to access this, which is odd? Hasn't created any
@@ -191,9 +191,9 @@ set -xe
 
 # Run in loop to restart the server if it crashes
 while true; do
-    java -jar ${JAR_NAME} nogui
+    java -jar ${SERVER_DIR}/${JAR_NAME} nogui
+    echo "Server crashed, restarting in 5.."
     sleep 5
-    echo "Server crashed, restarting"
 done
 EOF
 chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/start-server.sh"
@@ -220,6 +220,6 @@ download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/bu
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 
 # Start the minecraft server as the application user running in a named screen session
-su - "${APPLICATION_USER}" -c "cd ${SERVER_DIR} && screen -S mc -d -m ${SERVER_DIR}/start-server.sh"
+su - "${APPLICATION_USER}" -c "screen -S mc -d -m ${SERVER_DIR}/start-server.sh"
 
 # TODO https://downloadmoreram.com/
