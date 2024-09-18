@@ -69,7 +69,7 @@ resource "aws_key_pair" "prod_personal_key" {
 
 resource "aws_instance" "prod_mc_server" {
     ami = "ami-0b947c5d5516fa06e"
-    instance_type = "t4g.medium"
+    instance_type = "t4g.large"
     key_name = aws_key_pair.prod_personal_key.key_name
     security_groups = [
         aws_security_group.prod_allow_all_egress.name,
