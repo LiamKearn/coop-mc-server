@@ -179,6 +179,20 @@ EOF
 # issues but I saw a warning in the logs while spinning this fella up
 chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.properties"
 
+cat <<EOF > "${SERVER_DIR}/start-server.sh"
+#!/usr/bin/env sh
+set -xe
+
+# Run in loop to restart the server if it crashes
+while true; do
+    java -jar ${JAR_NAME} nogui
+    sleep 5
+    echo "Server crashed, restarting"
+done
+EOF
+chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/start-server.sh"
+chmod +x "${SERVER_DIR}/start-server.sh"
+
 # Install Amazon's java runtime
 sudo yum install -y java-21-amazon-corretto-headless
 
@@ -200,6 +214,6 @@ download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.2/bu
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 
 # Start the minecraft server as the application user running in a named screen session
-su - "${APPLICATION_USER}" -c "cd ${SERVER_DIR} && screen -S mc -d -m java -jar ${JAR_NAME} nogui"
+su - "${APPLICATION_USER}" -c "cd ${SERVER_DIR} && screen -S mc -d -m ${SERVER_DIR}/start-server.sh"
 
 # TODO https://downloadmoreram.com/
