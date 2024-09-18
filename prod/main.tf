@@ -2,8 +2,21 @@ provider "aws" {
     region = var.aws_region
 }
 
+# resource "aws_security_group" "prod_allow_minecraft_map_viewer_ingress" {
+#     name        = "allow_minecraft_map_viewer_ingress"
+#     description = "Allows ingress traffic for viewing the minecraft map"
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "prod_allow_minecraft_map_viewer_ingress" {
+#     security_group_id = aws_security_group.prod_allow_minecraft_map_viewer_ingress.id
+#     cidr_ipv4         = var.personal_ip_cidr
+#     from_port         = 8080
+#     ip_protocol       = "tcp"
+#     to_port           = 8080
+# }
+
 resource "aws_security_group" "prod_allow_minecraft_ingress" {
-    name        = "allow_minecraft_ingress"
+    name        = "prod_allow_minecraft_ingress"
     description = "Allows minecraft ingress traffic for game-server activity"
 }
 
@@ -24,7 +37,7 @@ resource "aws_vpc_security_group_ingress_rule" "prod_allow_minecraft_bedrock_ing
 }
 
 resource "aws_security_group" "prod_allow_administration_ingress" {
-    name        = "allow_administration_ingress"
+    name        = "prod_allow_administration_ingress"
     description = "Allows ingress traffic for administration purposes"
 }
 
@@ -46,7 +59,7 @@ resource "aws_vpc_security_group_ingress_rule" "prod_allow_personal_ingress" {
 }
 
 resource "aws_security_group" "prod_allow_all_egress" {
-    name        = "allow_all_egress"
+    name        = "prod_allow_all_egress"
     description = "Allows all egress traffic"
 }
 
@@ -63,7 +76,7 @@ resource "aws_vpc_security_group_egress_rule" "prod_allow_all_traffic_ipv6" {
 }
 
 resource "aws_key_pair" "prod_personal_key" {
-    key_name   = "personal-key"
+    key_name   = "prod_personal-key"
     public_key = var.personal_public_key
 }
 
@@ -76,7 +89,7 @@ resource "aws_instance" "prod_mc_server" {
         aws_security_group.prod_allow_administration_ingress.name,
         aws_security_group.prod_allow_minecraft_ingress.name,
     ]
-    user_data = "${file("./scripts/start.sh")}"
+    user_data = "${file("${path.module}/../scripts/start.sh")}"
     availability_zone = var.aws_availability_zone
 
     tags = {

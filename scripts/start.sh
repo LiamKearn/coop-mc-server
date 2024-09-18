@@ -218,6 +218,7 @@ download_mod "https://cdn.modrinth.com/data/s86X568j/versions/uT1cdd3k/ChunkyBor
 # Geyser returns a UTF8 filename content-disposition header, which is not supported by curl, we need to manually specifiy the filename here.
 download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/builds/676/downloads/fabric" "cfb15ad7c1b938af8ad96554d2764549f66899262cc3579fdcdbc94bcc5400a5" "Geyser-Fabric.jar"
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
+# download_mod "https://cdn.modrinth.com/data/PFb7ZqK6/versions/DJbC2aUl/squaremap-fabric-mc1.21.1-1.2.7.jar" "d8b06c000a7d1701deef44effab230d0810300f8b6daeeb01033d2f1d98fc06b"
 
 # Start the minecraft server as the application user running in a named screen session
 su - "${APPLICATION_USER}" -c "screen -S mc -d -m ${SERVER_DIR}/start-server.sh"
