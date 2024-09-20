@@ -196,7 +196,7 @@ set -xe
 
 # Run in loop to restart the server if it crashes
 while true; do
-    java -jar ${SERVER_DIR}/${JAR_NAME} nogui
+    java -jar ${SERVER_DIR}/${JAR_NAME} nogui -dir ${SERVER_DIR}
     echo "Server crashed, restarting in 5.."
     sleep 5
 done
