@@ -82,7 +82,7 @@ resource "aws_key_pair" "dev_personal_key" {
 
 resource "aws_instance" "dev_mc_server" {
     ami = "ami-0b947c5d5516fa06e"
-    instance_type = "t4g.large"
+    instance_type = "t4g.medium"
     key_name = aws_key_pair.dev_personal_key.key_name
     security_groups = [
         aws_security_group.dev_allow_all_egress.name,
