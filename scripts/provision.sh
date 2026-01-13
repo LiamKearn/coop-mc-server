@@ -27,10 +27,10 @@ download_mod() {
     if [ -n "$FORCE_FILENAME" ]; then
         DOWNLOADED_PATH="${SERVER_DIR}/mods/${FORCE_FILENAME}"
         echo "Forcing output to ${DOWNLOADED_PATH}"
-        curl -o "${DOWNLOADED_PATH}" -sSOJ "${URL}"
+        sudo curl -o "${DOWNLOADED_PATH}" -sSOJ "${URL}"
     else
         echo "Not forcing output name"
-        DOWNLOADED_PATH=$(curl --output-dir "${SERVER_DIR}/mods" -sSOJ "${URL}" -w "%{filename_effective}\n" )
+        DOWNLOADED_PATH=$(sudo curl --output-dir "${SERVER_DIR}/mods" -sSOJ "${URL}" -w "%{filename_effective}\n" )
     fi
     echo "Downloaded mod to ${DOWNLOADED_PATH}"
     check_the_sum "${DOWNLOADED_PATH}" "${CHECKSUM}"
@@ -89,27 +89,27 @@ sudo chown -R mcuser:mcuser /home/mcuser
 sudo chmod 755 /home/mcuser
 
 # Setup a server directory
-mkdir -p "${SERVER_DIR}"
-chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}"
+sudo mkdir -p "${SERVER_DIR}"
+sudo chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}"
 
 # Link stateful files and directories
 # TODO: Store server-icon in this repo and use cloud-init's write_files to
 # write it to the server directory
-ln -s "${STATE_DIR}/server-icon.png" "${SERVER_DIR}/server-icon.png"
-ln -s "${STATE_DIR}/world" "${SERVER_DIR}/world"
-ln -s "${STATE_DIR}/logs" "${SERVER_DIR}/logs"
-ln -s "${STATE_DIR}/config" "${SERVER_DIR}/config"
-ln -s "${STATE_DIR}/whitelist.json" "${SERVER_DIR}/whitelist.json"
-ln -s "${STATE_DIR}/banned-ips.json" "${SERVER_DIR}/banned-ips.json"
-ln -s "${STATE_DIR}/banned-players.json" "${SERVER_DIR}/banned-players.json"
-ln -s "${STATE_DIR}/ops.json" "${SERVER_DIR}/ops.json"
+sudo ln -s "${STATE_DIR}/server-icon.png" "${SERVER_DIR}/server-icon.png"
+sudo ln -s "${STATE_DIR}/world" "${SERVER_DIR}/world"
+sudo ln -s "${STATE_DIR}/logs" "${SERVER_DIR}/logs"
+sudo ln -s "${STATE_DIR}/config" "${SERVER_DIR}/config"
+sudo ln -s "${STATE_DIR}/whitelist.json" "${SERVER_DIR}/whitelist.json"
+sudo ln -s "${STATE_DIR}/banned-ips.json" "${SERVER_DIR}/banned-ips.json"
+sudo ln -s "${STATE_DIR}/banned-players.json" "${SERVER_DIR}/banned-players.json"
+sudo ln -s "${STATE_DIR}/ops.json" "${SERVER_DIR}/ops.json"
 
 # This one is "unique" because of expert developers
-mkdir -p "${SERVER_DIR}/mods"
-ln -s "${STATE_DIR}/luckperms" "${SERVER_DIR}/mods/luckperms"
-chown -h "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/mods/luckperms"
+sudo mkdir -p "${SERVER_DIR}/mods"
+sudo ln -s "${STATE_DIR}/luckperms" "${SERVER_DIR}/mods/luckperms"
+sudo chown -h "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/mods/luckperms"
 
-cat <<EOF > "${SERVER_DIR}/allowed_symlinks.txt"
+sudo tee "${SERVER_DIR}/allowed_symlinks.txt" <<EOF
 ${STATE_DIR}/world
 ${STATE_DIR}/logs
 ${STATE_DIR}/config
@@ -119,11 +119,11 @@ ${STATE_DIR}/banned-players.json
 ${STATE_DIR}/ops.json
 EOF
 
-cat <<EOF > "${SERVER_DIR}/eula.txt"
+sudo tee "${SERVER_DIR}/eula.txt" <<EOF
 eula=true
 EOF
 
-cat <<EOF > "${SERVER_DIR}/server.properties"
+sudo tee "${SERVER_DIR}/server.properties" <<EOF
 accepts-transfers=false
 allow-flight=false
 allow-nether=true
@@ -190,7 +190,7 @@ white-list=true
 EOF
 # Something seems to want to access this, which is odd? Hasn't created any
 # issues but I saw a warning in the logs while spinning this fella up
-chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.properties"
+sudo chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.properties"
 
 cat <<EOF > "${SERVER_DIR}/start-server.sh"
 #!/usr/bin/env sh
@@ -210,8 +210,8 @@ chmod +x "${SERVER_DIR}/start-server.sh"
 sudo yum install -y java-21-amazon-corretto-headless
 
 # Download the server jar
-curl -o "${JAR_PATH}" -OJ "${DOWNLOAD_LOCATION}"
 check_the_sum "${JAR_PATH}" "${SERVER_JAR_CHECKSUM}"
+sudo curl -o "${FABRIC_INSTALLER_JAR_PATH}" -OJ "${FABRIC_INSTALLER_JAR_URL}"
 
 # Now for modifications!
 
