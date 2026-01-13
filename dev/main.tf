@@ -89,7 +89,7 @@ resource "aws_instance" "dev_mc_server" {
         aws_security_group.dev_allow_administration_ingress.name,
         aws_security_group.dev_allow_minecraft_ingress.name,
     ]
-    user_data = "${file("${path.module}/../scripts/start.sh")}"
+    user_data = "${file("${path.module}/../scripts/provision.sh")}"
     availability_zone = var.aws_availability_zone
 
     tags = {
