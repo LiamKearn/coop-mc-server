@@ -81,7 +81,9 @@ resource "aws_key_pair" "prod_personal_key" {
 }
 
 resource "aws_instance" "prod_mc_server" {
-    ami = "ami-0b947c5d5516fa06e"
+  # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
+  ami           = "ami-07e0607027b22d739"
+
     instance_type = "t4g.large"
     key_name = aws_key_pair.prod_personal_key.key_name
     security_groups = [
