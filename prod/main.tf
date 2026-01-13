@@ -89,7 +89,31 @@ resource "aws_instance" "prod_mc_server" {
         aws_security_group.prod_allow_administration_ingress.name,
         aws_security_group.prod_allow_minecraft_ingress.name,
     ]
-    user_data = "${file("${path.module}/../scripts/provision.sh")}"
+
+    user_data = <<-EOF
+      #cloud-config
+      runcmd:
+        - |
+          STATE_DEVICE_NAME=/dev/sdf
+          STATE_DIR=/home/mcuser/mcstate
+  
+          # Ensure the mount point exists
+          mkdir -p $STATE_DIR
+  
+          # Wait for the device to appear
+          while [ ! -e "$STATE_DEVICE_NAME" ]; do sleep 1; done
+  
+          # Create filesystem if not present
+          if ! blkid "$STATE_DEVICE_NAME"; then
+            mkfs -t ext4 "$STATE_DEVICE_NAME"
+          fi
+  
+          # Add to fstab (avoid duplicates)
+          grep -q "$STATE_DEVICE_NAME" /etc/fstab || echo "$STATE_DEVICE_NAME $STATE_DIR ext4 defaults,nofail 0 2" >> /etc/fstab
+  
+          # Mount it
+          mount -a
+    EOF
     availability_zone = var.aws_availability_zone
 
     tags = {

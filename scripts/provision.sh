@@ -64,24 +64,9 @@ STATE_DIR="/home/${APPLICATION_USER}/mcstate"
 # END VARIABLES
 # ========================================================
 
-# Setup the state directory
-sudo mkdir -p "${STATE_DIR}"
 
-# Setup the EBS volume to be mounted
-sudo cat >> /etc/fstab <<EOF
-${STATE_DEVICE_NAME} ${STATE_DIR} ext4 defaults,nofail 0 2
-EOF
 
-# Wait for the EBS volume to be attached
-while [ ! -e "${STATE_DEVICE_NAME}" ]; do sleep 1; done
 
-# Test if there is an existing filesystem on the volume, if not make one
-if ! blkid "${STATE_DEVICE_NAME}"; then
-    mkfs -t ext4 "${STATE_DEVICE_NAME}"
-fi
-
-# Mount the volume
-sudo mount -a
 
 # Create a application user
 id "${APPLICATION_USER}" >/dev/null 2>&1 || sudo adduser "${APPLICATION_USER}"
