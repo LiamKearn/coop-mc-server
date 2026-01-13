@@ -81,7 +81,7 @@ func findTCPAddrFromInstance(ctx context.Context, client *ec2.Client, instanceId
 		panic("no IPv4 address attached")
 	}
 
-	firstIPv4 := *inst.NetworkInterfaces[0].PrivateIpAddress
+	firstIPv4 := *inst.NetworkInterfaces[0].Association.PublicIp
 
 	addr := &net.TCPAddr{
 		IP:   net.ParseIP(firstIPv4),
