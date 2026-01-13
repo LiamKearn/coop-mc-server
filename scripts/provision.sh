@@ -231,7 +231,4 @@ download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/bu
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/l47d4ZWk/LuckPerms-Fabric-5.4.140.jar" "3e17d490f87761c174478f68860367610a473ff5c2a9a9daad608773bf0e81bc"
 
-# Start the minecraft server as the application user running in a named screen session
-su - "${APPLICATION_USER}" -c "screen -S mc -d -m ${SERVER_DIR}/start-server.sh"
-
 # TODO https://downloadmoreram.com/
