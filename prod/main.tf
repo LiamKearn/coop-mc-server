@@ -157,6 +157,34 @@ resource "aws_instance" "prod_mc_server" {
   }
 }
 
+# TODO: Check that it initialises userdata first.
+# Stop the instance after creation, the proxy should be starting it when needed.
+# resource "aws_ec2_instance_state" "prod_mc_server_stopped" {
+#   instance_id = aws_instance.prod_mc_server.id
+#   state       = "stopped"
+#   depends_on  = [aws_instance.prod_mc_server]
+# }
+
+resource "aws_cloudwatch_metric_alarm" "prod_stop_instance_on_zero_players" {
+  alarm_name          = "ProdStopInstanceWhenNoPlayers"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  threshold           = 0
+  namespace           = "coopmcserver"
+  metric_name         = "playercount"
+  evaluation_periods  = 4   # 4 periods x 5 min = 20 minutes
+  period              = 300 # 5 minutes
+  statistic           = "Minimum"
+  alarm_description   = "Stops the EC2 instance if there are 0 players for 20 minutes"
+
+  alarm_actions = [
+    "arn:aws:automate:${var.aws_region}:ec2:stop"
+  ]
+
+  dimensions = {
+    InstanceId = aws_instance.prod_mc_server.id
+  }
+}
+
 data "aws_ebs_volume" "prod_mcstate" {
   most_recent = true
   filter {
