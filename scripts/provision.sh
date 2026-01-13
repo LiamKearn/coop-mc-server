@@ -118,7 +118,7 @@ difficulty=hard
 enable-command-block=false
 enable-jmx-monitoring=false
 enable-query=false
-enable-rcon=false
+enable-rcon=true
 enable-status=true
 enforce-secure-profile=true
 enforce-whitelist=false
@@ -151,8 +151,8 @@ prevent-proxy-connections=false
 pvp=true
 query.port=25565
 rate-limit=0
-rcon.password=
-rcon.port=25575
+rcon.password=coop
+rcon.port=50323
 region-file-compression=deflate
 require-resource-pack=false
 resource-pack=
@@ -218,8 +218,6 @@ sudo curl -o /usr/local/bin/rcon -L "https://github.com/Sch8ill/rcon/releases/do
 check_the_sum "/usr/local/bin/rcon" "ba600de1c96a24d7b388777c1521e43e3a1a78e4401d5d019ffb52d37f625899"
 sudo chmod +x /usr/local/bin/rcon
 
-# Setup a cron which rcon's player count and sends it to cloudwatch every 5 minutes
-
 # Now for modifications!
 
 # Not yet setup
@@ -239,6 +237,48 @@ download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate
 download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/l47d4ZWk/LuckPerms-Fabric-5.4.140.jar" "3e17d490f87761c174478f68860367610a473ff5c2a9a9daad608773bf0e81bc"
 download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricProxy-Lite-2.10.1.jar" "36737b62c7a5dfb679ac3fac6a7db10f9a423317fba19574bc4d472b4711c742"
 
+# Cron script for pushing player count
+sudo tee /usr/local/bin/push_player_count.sh <<'SCRIPT'
+#!/bin/bash
+LINE=$(/usr/local/bin/rcon --no-colors -a localhost:50323 -p 'coop' -c 'list')
+PLAYER_COUNT=$(echo "$LINE" | sed -n 's/There are \([0-9]\+\) .*/\1/p')
+
+aws cloudwatch put-metric-data \
+--namespace coopmcserver \
+--metric-name playercount \
+--value "$PLAYER_COUNT" \
+SCRIPT
+sudo chmod +x /usr/local/bin/push_player_count.sh
+
+# Systemd timer for pushing player count every 5 minutes
+sudo tee /etc/systemd/system/push_player_count.timer <<EOF
+[Unit]
+Description=Push Minecraft player count to CloudWatch every 5 minutes
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Unit=push_player_count.service
+[Install]
+WantedBy=timers.target
+EOF
+sudo mkdir -p /etc/systemd/system/timers.target.wants
+sudo ln -sf /etc/systemd/system/push_player_count.timer \
+            /etc/systemd/system/timers.target.wants/push_player_count.timer
+
+sudo tee /etc/systemd/system/push_player_count.service <<EOF
+[Unit]
+Description=Push Minecraft player count to CloudWatch
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/push_player_count.sh
+StandardOutput=journal
+StandardError=journal
+EOF
+sudo mkdir -p /etc/systemd/system/multi-user.target.wants
+sudo ln -sf /etc/systemd/system/push_player_count.service \
+            /etc/systemd/system/multi-user.target.wants/push_player_count.service
+
+# Install server files using the fabric installer
 sudo su - "${APPLICATION_USER}" -c "cd '${SERVER_DIR}' && java -jar '${FABRIC_INSTALLER_JAR_PATH}' server -mcversion '${MINECRAFT_VERSION}' -downloadMinecraft"
 
 # TODO https://downloadmoreram.com/

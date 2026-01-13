@@ -80,9 +80,42 @@ resource "aws_key_pair" "dev_personal_key" {
   public_key = var.personal_public_key
 }
 
+resource "aws_iam_role" "dev_mc_instance_role" {
+  name = "dev-mc-instance-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "dev_mc_instance_policy" {
+  role = aws_iam_role.dev_mc_instance_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "dev_mc_instance" {
+  name = "mc-instance-profile"
+  role = aws_iam_role.dev_mc_instance_role.name
+}
+
 resource "aws_instance" "dev_mc_server" {
   # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
-  ami = "ami-0fe045deb3af61a4a"
+  ami = "ami-03a6773bae2c1523f"
 
   instance_type = "t4g.medium"
   key_name      = aws_key_pair.dev_personal_key.key_name
@@ -91,27 +124,29 @@ resource "aws_instance" "dev_mc_server" {
     aws_security_group.dev_allow_administration_ingress.name,
     aws_security_group.dev_allow_minecraft_ingress.name,
   ]
+  iam_instance_profile = aws_iam_instance_profile.dev_mc_instance.name
+
   user_data         = <<-EOF
       #cloud-config
       runcmd:
         - |
           STATE_DEVICE_NAME=/dev/sdf
           STATE_DIR=/home/mcuser/mcstate
-  
+
           # Ensure the mount point exists
           mkdir -p $STATE_DIR
-  
+
           # Wait for the device to appear
           while [ ! -e "$STATE_DEVICE_NAME" ]; do sleep 1; done
-  
+
           # Create filesystem if not present
           if ! blkid "$STATE_DEVICE_NAME"; then
             mkfs -t ext4 "$STATE_DEVICE_NAME"
           fi
-  
+
           # Add to fstab (avoid duplicates)
           grep -q "$STATE_DEVICE_NAME" /etc/fstab || echo "$STATE_DEVICE_NAME $STATE_DIR ext4 defaults,nofail 0 2" >> /etc/fstab
-  
+
           # Mount it
           mount -a
     EOF
