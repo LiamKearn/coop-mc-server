@@ -15,9 +15,9 @@ import (
 )
 
 type Eggpress struct {
-	keep time.Time
-	ec2  *ec2.Client
-	inst string
+	keep   time.Time
+	ec2    *ec2.Client
+	inst   string
 	server proxy.RegisteredServer
 }
 
@@ -35,7 +35,7 @@ func NewEggpressPlugin(targetInstanceId string) proxy.Plugin {
 
 			egg := &Eggpress{
 				keep: time.Now(),
-				ec2:  ec2.NewFromConfig(cfg, func(o *ec2.Options) {
+				ec2: ec2.NewFromConfig(cfg, func(o *ec2.Options) {
 					// TODO: This can be omitted in prod since it will be inferred.
 					o.Region = "us-east-1"
 				}),
@@ -87,6 +87,9 @@ func findTCPAddrFromInstance(ctx context.Context, client *ec2.Client, instanceId
 		IP:   net.ParseIP(firstIPv4),
 		Port: 25565,
 	}
+
+	fmt.Println("Found instance address:", addr.String())
+
 	return addr, nil
 }
 
