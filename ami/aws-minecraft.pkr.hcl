@@ -19,7 +19,7 @@ source "amazon-ebs" "minecraft" {
 }
 
 build {
-  name = "learn-packer"
+  name = "minecraft-fabric-server"
   sources = [
     "source.amazon-ebs.minecraft"
   ]
