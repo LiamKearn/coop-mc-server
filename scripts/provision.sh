@@ -230,5 +230,6 @@ download_mod "https://cdn.modrinth.com/data/s86X568j/versions/uT1cdd3k/ChunkyBor
 download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/builds/676/downloads/fabric" "cfb15ad7c1b938af8ad96554d2764549f66899262cc3579fdcdbc94bcc5400a5" "Geyser-Fabric.jar"
 download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/l47d4ZWk/LuckPerms-Fabric-5.4.140.jar" "3e17d490f87761c174478f68860367610a473ff5c2a9a9daad608773bf0e81bc"
+download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricProxy-Lite-2.10.1.jar" "36737b62c7a5dfb679ac3fac6a7db10f9a423317fba19574bc4d472b4711c742"
 
 # TODO https://downloadmoreram.com/
