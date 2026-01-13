@@ -188,6 +188,7 @@ Group=${APPLICATION_USER}
 
 WorkingDirectory=${SERVER_DIR}
 ExecStart=java -jar ${SERVER_DIR}/fabric-server-launch.jar nogui
+KillSignal=SIGTERM
 
 Restart=always
 RestartSec=5
@@ -211,6 +212,13 @@ sudo yum install -y java-21-amazon-corretto-headless
 # Download the server jar
 sudo curl -o "${FABRIC_INSTALLER_JAR_PATH}" -OJ "${FABRIC_INSTALLER_JAR_URL}"
 check_the_sum "${FABRIC_INSTALLER_JAR_PATH}" "${FABRIC_INSTALLER_JAR_CHECKSUM}"
+
+# Install a RCON client
+sudo curl -o /usr/local/bin/rcon -L "https://github.com/Sch8ill/rcon/releases/download/1.4.0/rcon-cli-v1.4.0-linux-arm64"
+check_the_sum "/usr/local/bin/rcon" "ba600de1c96a24d7b388777c1521e43e3a1a78e4401d5d019ffb52d37f625899"
+sudo chmod +x /usr/local/bin/rcon
+
+# Setup a cron which rcon's player count and sends it to cloudwatch every 5 minutes
 
 # Now for modifications!
 

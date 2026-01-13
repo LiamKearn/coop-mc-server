@@ -82,7 +82,7 @@ resource "aws_key_pair" "dev_personal_key" {
 
 resource "aws_instance" "dev_mc_server" {
   # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
-  ami = "ami-07e0607027b22d739"
+  ami = "ami-0fe045deb3af61a4a"
 
   instance_type = "t4g.medium"
   key_name      = aws_key_pair.dev_personal_key.key_name
