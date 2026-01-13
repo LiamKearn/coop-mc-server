@@ -84,7 +84,9 @@ fi
 sudo mount -a
 
 # Create a application user
-sudo adduser "${APPLICATION_USER}"
+id "${APPLICATION_USER}" >/dev/null 2>&1 || sudo adduser "${APPLICATION_USER}"
+sudo chown -R mcuser:mcuser /home/mcuser
+sudo chmod 755 /home/mcuser
 
 # Setup a server directory
 mkdir -p "${SERVER_DIR}"
