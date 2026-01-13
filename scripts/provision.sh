@@ -240,8 +240,10 @@ download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricPro
 # Cron script for pushing player count
 sudo tee /usr/local/bin/push_player_count.sh <<'SCRIPT'
 #!/bin/bash
-LINE=$(/usr/local/bin/rcon --no-colors -a localhost:50323 -p 'coop' -c 'list')
+LINE=$(/usr/local/bin/rcon --no-colors -a localhost:50323 -p 'coop' -c 'list' | tr -d '\0')
 PLAYER_COUNT=$(echo "$LINE" | sed -n 's/There are \([0-9]\+\) .*/\1/p')
+
+echo "Pushing player count: $PLAYER_COUNT"
 
 aws cloudwatch put-metric-data \
 --namespace coopmcserver \

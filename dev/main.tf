@@ -115,7 +115,7 @@ resource "aws_iam_instance_profile" "dev_mc_instance" {
 
 resource "aws_instance" "dev_mc_server" {
   # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
-  ami = "ami-03a6773bae2c1523f"
+  ami = "ami-0dd0e1fe9cfc0c93e"
 
   instance_type = "t4g.medium"
   key_name      = aws_key_pair.dev_personal_key.key_name
@@ -165,6 +165,18 @@ resource "aws_instance" "dev_mc_server" {
 #   depends_on  = [aws_instance.dev_mc_server]
 # }
 
+resource "aws_sns_topic" "dev_liam_alarm_notifications" {
+  name = "dev-liam-alarm-notifications"
+}
+
+resource "aws_sns_topic_subscription" "email" {
+  topic_arn = aws_sns_topic.dev_liam_alarm_notifications.arn
+  protocol  = "email"
+  endpoint  = "lkearney999@gmail.com"
+}
+
+# Nushell example:
+# ^aws cloudwatch get-metric-data   --metric-data-queries '[{"Id":"playercountQuery","MetricStat":{"Metric":{"Namespace":"coopmcserver","MetricName":"playercount"},"Period":5,"Stat":"Maximum"},"ReturnData":true}]'   --start-time ((date now) - 20min | format date "%+") --end-time (date now | format date "%+") --region us-east-1
 resource "aws_cloudwatch_metric_alarm" "dev_stop_instance_on_zero_players" {
   alarm_name          = "devStopInstanceWhenNoPlayers"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -173,16 +185,33 @@ resource "aws_cloudwatch_metric_alarm" "dev_stop_instance_on_zero_players" {
   metric_name         = "playercount"
   evaluation_periods  = 4   # 4 periods x 5 min = 20 minutes
   period              = 300 # 5 minutes
-  statistic           = "Minimum"
+  statistic           = "Maximum"
   alarm_description   = "Stops the EC2 instance if there are 0 players for 20 minutes"
 
-  alarm_actions = [
-    "arn:aws:automate:${var.aws_region}:ec2:stop"
-  ]
+  treat_missing_data = "missing"
 
-  dimensions = {
-    InstanceId = aws_instance.dev_mc_server.id
-  }
+  alarm_actions = [
+    "arn:aws:automate:${var.aws_region}:ec2:stop",
+    aws_sns_topic.dev_liam_alarm_notifications.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "dev_instance_is_active_long" {
+  alarm_name          = "devInstanceIsActiveLong"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 0
+  namespace           = "coopmcserver"
+  metric_name         = "playercount"
+  evaluation_periods  = 4   # 4 periods x 6 hours = 24 hours
+  period              = 21600 # 6 hours
+  statistic           = "Maximum"
+  alarm_description   = "Notifies if the EC2 instance has been active for more than 24 hours"
+
+  treat_missing_data = "missing"
+
+  alarm_actions = [
+    aws_sns_topic.dev_liam_alarm_notifications.arn
+  ]
 }
 
 data "aws_ebs_volume" "dev_mcstate" {
