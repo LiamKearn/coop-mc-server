@@ -115,7 +115,7 @@ resource "aws_iam_instance_profile" "prod_mc_instance" {
 
 resource "aws_instance" "prod_mc_server" {
   # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
-  ami = "ami-0dd0e1fe9cfc0c93e"
+  ami = "ami-0365ec0debd4c3808"
 
   instance_type = "t4g.large"
   key_name      = aws_key_pair.prod_personal_key.key_name
@@ -194,6 +194,10 @@ resource "aws_cloudwatch_metric_alarm" "prod_stop_instance_on_zero_players" {
     "arn:aws:automate:${var.aws_region}:ec2:stop",
     aws_sns_topic.prod_liam_alarm_notifications.arn
   ]
+
+  dimensions = {
+    InstanceId = aws_instance.prod_mc_server.id
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod_instance_is_active_long" {
@@ -212,6 +216,10 @@ resource "aws_cloudwatch_metric_alarm" "prod_instance_is_active_long" {
   alarm_actions = [
     aws_sns_topic.prod_liam_alarm_notifications.arn
   ]
+
+  dimensions = {
+    InstanceId = aws_instance.prod_mc_server.id
+  }
 }
 
 data "aws_ebs_volume" "prod_mcstate" {

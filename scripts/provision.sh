@@ -240,15 +240,23 @@ download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricPro
 # Cron script for pushing player count
 sudo tee /usr/local/bin/push_player_count.sh <<'SCRIPT'
 #!/bin/bash
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 100")
+INSTANCE_ID=$(curl -s \
+  -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/instance-id)
 LINE=$(/usr/local/bin/rcon --no-colors -a localhost:50323 -p 'coop' -c 'list' | tr -d '\0')
 PLAYER_COUNT=$(echo "$LINE" | sed -n 's/There are \([0-9]\+\) .*/\1/p')
 
+echo "Instance ID: $INSTANCE_ID"
+echo "RCON response line: '$LINE'"
 echo "Pushing player count: $PLAYER_COUNT"
 
 aws cloudwatch put-metric-data \
 --namespace coopmcserver \
 --metric-name playercount \
---value "$PLAYER_COUNT" \
+--dimensions InstanceId="$INSTANCE_ID" \
+--value "$PLAYER_COUNT"
 SCRIPT
 sudo chmod +x /usr/local/bin/push_player_count.sh
 
