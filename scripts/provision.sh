@@ -60,8 +60,10 @@ FABRIC_INSTALLER_JAR_NAME="fabric-installer-${FABRIC_INSTALLER_VERSION}.jar"
 FABRIC_INSTALLER_JAR_URL="https://maven.fabricmc.net/net/fabricmc/fabric-installer/${FABRIC_INSTALLER_VERSION}/${FABRIC_INSTALLER_JAR_NAME}"
 FABRIC_INSTALLER_JAR_PATH="${SERVER_DIR}/${FABRIC_INSTALLER_JAR_NAME}"
 
-SERVICE_NAME="minecraft-fabric-server"
-SERVICE_FILE_PATH="/etc/systemd/system/${SERVICE_NAME}.service"
+SYSTEMD_MINECRAFT_STATE_MOUNT="minecraft-state.mount"
+SYSTEMD_FABRIC_SERVICE="minecraft-fabric-server.service"
+SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT="push_player_count.service"
+SYSTEMD_PUSH_PLAYER_COUNT_TIMER="push_player_count.timer"
 
 # ========================================================
 # END VARIABLES
@@ -137,7 +139,7 @@ level-seed=
 level-type=minecraft\:normal
 log-ips=true
 max-chained-neighbor-updates=1000000
-max-players=20
+max-players=67
 max-tick-time=60000
 # https://minecraft.fandom.com/wiki/Server.properties
 # Setting max-world-size to 4000 gives the player an 8000×8000 world border.
@@ -176,9 +178,33 @@ EOF
 # issues but I saw a warning in the logs while spinning this fella up
 sudo chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.properties"
 
-sudo tee "${SERVICE_FILE_PATH}" <<EOF
+# Mount the state disk as a systemd mount so that the server service can depend on it
+sudo tee "/etc/systemd/system/${SYSTEMD_MINECRAFT_STATE_MOUNT}" <<EOF
+[Unit]
+Description=Minecraft State Disk
+After=dev-sdf.device
+Requires=dev-sdf.device
+
+[Mount]
+What=/dev/sdf
+Where=/home/mcuser/mcstate
+Type=ext4
+Options=defaults,nofail
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo mkdir -p /etc/systemd/system/multi-user.target.wants
+sudo ln -sf \
+    "/etc/systemd/system/${SYSTEMD_MINECRAFT_STATE_MOUNT}" \
+    "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_MINECRAFT_STATE_MOUNT}"
+
+sudo tee "/etc/systemd/system/${SYSTEMD_FABRIC_SERVICE}" <<EOF
 [Unit]
 Description=Minecraft Fabric Server
+Requires=${SYSTEMD_MINECRAFT_STATE_MOUNT}
+After=${SYSTEMD_MINECRAFT_STATE_MOUNT}
 After=network.target
 
 [Service]
@@ -203,8 +229,8 @@ WantedBy=multi-user.target
 EOF
 sudo mkdir -p /etc/systemd/system/multi-user.target.wants
 sudo ln -sf \
-  "${SERVICE_FILE_PATH}" \
-  "/etc/systemd/system/multi-user.target.wants/${SERVICE_NAME}.service"
+  "/etc/systemd/system/${SYSTEMD_FABRIC_SERVICE}" \
+  "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_FABRIC_SERVICE}"
 
 # Install Amazon's java runtime
 sudo yum install -y java-21-amazon-corretto-headless
@@ -237,6 +263,10 @@ download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate
 download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/l47d4ZWk/LuckPerms-Fabric-5.4.140.jar" "3e17d490f87761c174478f68860367610a473ff5c2a9a9daad608773bf0e81bc"
 download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricProxy-Lite-2.10.1.jar" "36737b62c7a5dfb679ac3fac6a7db10f9a423317fba19574bc4d472b4711c742"
 
+# TODO, first systemd oneshot fails because the server isn't running yet.
+# `Jan 13 22:11:21 ip-172-31-25-83.ec2.internal push_player_count.sh[1983]: RCON response line: 'error while trying to connect: dial tcp 127.0.0.1:50323: connect: >`
+# We could add a dependency on the minecraft-fabric-server.service
+#
 # Cron script for pushing player count
 sudo tee /usr/local/bin/push_player_count.sh <<'SCRIPT'
 #!/bin/bash
@@ -261,9 +291,12 @@ SCRIPT
 sudo chmod +x /usr/local/bin/push_player_count.sh
 
 # Systemd timer for pushing player count every 5 minutes
-sudo tee /etc/systemd/system/push_player_count.timer <<EOF
+sudo tee "/etc/systemd/system/${SYSTEMD_PUSH_PLAYER_COUNT_TIMER}" <<EOF
 [Unit]
 Description=Push Minecraft player count to CloudWatch every 5 minutes
+Requires=${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}
+Requires=${SYSTEMD_FABRIC_SERVICE}
+After=${SYSTEMD_FABRIC_SERVICE}
 [Timer]
 OnBootSec=5min
 OnUnitActiveSec=5min
@@ -272,12 +305,13 @@ Unit=push_player_count.service
 WantedBy=timers.target
 EOF
 sudo mkdir -p /etc/systemd/system/timers.target.wants
-sudo ln -sf /etc/systemd/system/push_player_count.timer \
-            /etc/systemd/system/timers.target.wants/push_player_count.timer
+sudo ln -sf "/etc/systemd/system/${SYSTEMD_PUSH_PLAYER_COUNT_TIMER}" \
+            "/etc/systemd/system/timers.target.wants/${SYSTEMD_PUSH_PLAYER_COUNT_TIMER}"
 
-sudo tee /etc/systemd/system/push_player_count.service <<EOF
+sudo tee "/etc/systemd/system/${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}" <<EOF
 [Unit]
 Description=Push Minecraft player count to CloudWatch
+Requires=${SYSTEMD_FABRIC_SERVICE}
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/push_player_count.sh
@@ -285,8 +319,8 @@ StandardOutput=journal
 StandardError=journal
 EOF
 sudo mkdir -p /etc/systemd/system/multi-user.target.wants
-sudo ln -sf /etc/systemd/system/push_player_count.service \
-            /etc/systemd/system/multi-user.target.wants/push_player_count.service
+sudo ln -sf "/etc/systemd/system/${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}" \
+            "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}"
 
 # Install server files using the fabric installer
 sudo su - "${APPLICATION_USER}" -c "cd '${SERVER_DIR}' && java -jar '${FABRIC_INSTALLER_JAR_PATH}' server -mcversion '${MINECRAFT_VERSION}' -downloadMinecraft"
