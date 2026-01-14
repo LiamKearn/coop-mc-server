@@ -69,6 +69,10 @@ SYSTEMD_PUSH_PLAYER_COUNT_TIMER="push_player_count.timer"
 # END VARIABLES
 # ========================================================
 
+# Install Amazon's java runtime early in the background since it takes ages
+sudo yum install -y java-21-amazon-corretto-headless &
+JAVA_INSTALL_PID=$!
+
 # Create a application user
 id "${APPLICATION_USER}" >/dev/null 2>&1 || sudo adduser "${APPLICATION_USER}"
 sudo chown -R mcuser:mcuser /home/mcuser
@@ -232,9 +236,6 @@ sudo ln -sf \
   "/etc/systemd/system/${SYSTEMD_FABRIC_SERVICE}" \
   "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_FABRIC_SERVICE}"
 
-# Install Amazon's java runtime
-sudo yum install -y java-21-amazon-corretto-headless
-
 # Download the server jar
 sudo curl -o "${FABRIC_INSTALLER_JAR_PATH}" -OJ "${FABRIC_INSTALLER_JAR_URL}"
 check_the_sum "${FABRIC_INSTALLER_JAR_PATH}" "${FABRIC_INSTALLER_JAR_CHECKSUM}"
@@ -323,6 +324,7 @@ sudo ln -sf "/etc/systemd/system/${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}" \
             "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT}"
 
 # Install server files using the fabric installer
+wait $JAVA_INSTALL_PID
 sudo su - "${APPLICATION_USER}" -c "cd '${SERVER_DIR}' && java -jar '${FABRIC_INSTALLER_JAR_PATH}' server -mcversion '${MINECRAFT_VERSION}' -downloadMinecraft"
 
 # TODO https://downloadmoreram.com/

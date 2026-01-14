@@ -117,7 +117,7 @@ resource "aws_instance" "dev_mc_server" {
   # Nushell command to deregister previous AMI if needed (THIS DOESN'T DELETE SNAPSHOTS):
   # ^aws --region us-east-1 ec2 deregister-image --image-id (^aws --region us-east-1 ec2 describe-images --filters Name=name,Values=minecraft | from json | get Images | first | get ImageId)
   # Minecraft AMI built with Packer, See: ./ami/aws-minecraft.pkr.hcl
-  ami = "ami-05d15a2338ee767ca"
+  ami = "ami-0aa114e4d60d10c74"
 
   instance_type = "t4g.medium"
   key_name      = aws_key_pair.dev_personal_key.key_name
