@@ -60,7 +60,7 @@ FABRIC_INSTALLER_JAR_NAME="fabric-installer-${FABRIC_INSTALLER_VERSION}.jar"
 FABRIC_INSTALLER_JAR_URL="https://maven.fabricmc.net/net/fabricmc/fabric-installer/${FABRIC_INSTALLER_VERSION}/${FABRIC_INSTALLER_JAR_NAME}"
 FABRIC_INSTALLER_JAR_PATH="${SERVER_DIR}/${FABRIC_INSTALLER_JAR_NAME}"
 
-SYSTEMD_MINECRAFT_STATE_MOUNT="minecraft-state.mount"
+SYSTEMD_MINECRAFT_STATE_MOUNT="home-mcuser-mcstate.mount"
 SYSTEMD_FABRIC_SERVICE="minecraft-fabric-server.service"
 SYSTEMD_PUSH_PLAYER_COUNT_ONESHOT="push_player_count.service"
 SYSTEMD_PUSH_PLAYER_COUNT_TIMER="push_player_count.timer"
@@ -186,8 +186,10 @@ sudo chown "${APPLICATION_USER}:${APPLICATION_USER}" "${SERVER_DIR}/server.prope
 sudo tee "/etc/systemd/system/${SYSTEMD_MINECRAFT_STATE_MOUNT}" <<EOF
 [Unit]
 Description=Minecraft State Disk
-After=dev-sdf.device
+Requires=local-fs.target
 Requires=dev-sdf.device
+After=local-fs.target
+After=dev-sdf.device
 
 [Mount]
 What=/dev/sdf
