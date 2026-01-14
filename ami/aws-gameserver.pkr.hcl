@@ -25,7 +25,7 @@ build {
   ]
 
   provisioner "shell" {
-    script = "scripts/provision.sh"
+    script = "scripts/provision-gameserver.sh"
   }
 }
 
