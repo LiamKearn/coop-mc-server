@@ -176,7 +176,8 @@ resource "aws_sns_topic_subscription" "email" {
 }
 
 # Nushell example:
-# ^aws cloudwatch get-metric-data   --metric-data-queries '[{"Id":"playercountQuery","MetricStat":{"Metric":{"Namespace":"coopmcserver","MetricName":"playercount"},"Period":5,"Stat":"Maximum"},"ReturnData":true}]'   --start-time ((date now) - 20min | format date "%+") --end-time (date now | format date "%+") --region us-east-1
+# let instance_id = ^aws ec2 describe-instances --region us-east-1 --filters Name=tag:Name,Values=prod-mc-serves --filters Name=instance-state-name,Values=running | from json | get Reservations | first | get Instances | first | get InstanceId
+# ^aws cloudwatch get-metric-data --metric-data-queries $'[{"Id":"playercountQuery","MetricStat":{"Metric":{"Namespace":"coopmcserver","MetricName":"playercount","Dimensions":[{"Name":"InstanceId","Value":"($instance_id)"}]},"Period":5,"Stat":"Maximum"},"ReturnData":true}]' --start-time ((date now) - 20min | format date "%+") --end-time (date now | format date "%+") --region us-east-1
 resource "aws_cloudwatch_metric_alarm" "prod_stop_instance_on_zero_players" {
   alarm_name          = "ProdStopInstanceWhenNoPlayers"
   comparison_operator = "LessThanOrEqualToThreshold"
