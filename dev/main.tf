@@ -200,28 +200,6 @@ resource "aws_cloudwatch_metric_alarm" "dev_stop_instance_on_zero_players" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "dev_instance_is_active_long" {
-  alarm_name          = "devInstanceIsActiveLong"
-  comparison_operator = "GreaterThanThreshold"
-  threshold           = 0
-  namespace           = "coopmcserver"
-  metric_name         = "playercount"
-  evaluation_periods  = 4   # 4 periods x 6 hours = 24 hours
-  period              = 21600 # 6 hours
-  statistic           = "Maximum"
-  alarm_description   = "Notifies if the EC2 instance has been active for more than 24 hours"
-
-  treat_missing_data = "missing"
-
-  alarm_actions = [
-    aws_sns_topic.dev_liam_alarm_notifications.arn
-  ]
-
-  dimensions = {
-    InstanceId = aws_instance.prod_mc_server.id
-  }
-}
-
 data "aws_ebs_volume" "dev_mcstate" {
   most_recent = true
   filter {
