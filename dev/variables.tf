@@ -1,22 +1,5 @@
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "aws_availability_zone" {
-  description = "AWS availability zone"
-  type        = string
-  default     = "us-east-1b"
-}
-
-variable "personal_public_key" {
-  description = "Personal public key"
-  type        = string
-}
-
-variable "personal_ip_cidr" {
-  description = "Personal IP CIDR"
+variable "personal_email_address" {
+  description = "Personal Email Address for SNS Alarms"
   type        = string
 }
 
