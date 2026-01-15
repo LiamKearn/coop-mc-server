@@ -74,9 +74,9 @@ sudo yum install -y java-21-amazon-corretto-headless &
 JAVA_INSTALL_PID=$!
 
 # Create a application user
-id "${APPLICATION_USER}" >/dev/null 2>&1 || sudo adduser "${APPLICATION_USER}"
-sudo chown -R mcuser:mcuser /home/mcuser
-sudo chmod 755 /home/mcuser
+sudo adduser "${APPLICATION_USER}"
+sudo chown -R "${APPLICATION_USER}:${APPLICATION_USER}" "/home/${APPLICATION_USER}"
+sudo chmod 755 "/home/${APPLICATION_USER}"
 
 # Setup a server directory
 sudo mkdir -p "${SERVER_DIR}"
@@ -220,14 +220,18 @@ Group=${APPLICATION_USER}
 
 WorkingDirectory=${SERVER_DIR}
 ExecStart=java -jar ${SERVER_DIR}/fabric-server-launch.jar nogui
+
+StandardOutput=journal
+StandardError=journal
+
 KillSignal=SIGTERM
+TimeoutStopSec=60
+# MC is a JVM process, which can 143 on SIGTERM
+SuccessExitStatus=143
 
 Restart=always
 RestartSec=5
 
-SuccessExitStatus=143
-KillSignal=SIGTERM
-TimeoutStopSec=60
 LimitNOFILE=100000
 
 [Install]
