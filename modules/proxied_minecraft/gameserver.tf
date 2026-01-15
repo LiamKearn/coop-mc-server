@@ -88,7 +88,7 @@ resource "aws_instance" "gameserver" {
   tags = { Name = "${var.name_prefix}-gameserver" }
 
   # Nushell command to deregister previous AMI if needed (THIS DOESN'T DELETE SNAPSHOTS):
-  # ^aws --region us-east-1 ec2 deregister-image --image-id (^aws --region us-east-1 ec2 describe-images --filters Name=name,Values=minecraft | from json | get Images | first | get ImageId)
+  # ^aws --region us-east-1 ec2 deregister-image --image-id (^aws --region us-east-1 ec2 describe-images --filters Name=name,Values=minecraft-gameserver | from json | get Images | first | get ImageId)
   # Minecraft AMI built with Packer, See: ./ami/aws-gameserver.pkr.hcl
   ami = "ami-0dad37aad8bc5d67d"
 

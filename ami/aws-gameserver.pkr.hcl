@@ -7,8 +7,8 @@ packer {
   }
 }
 
-source "amazon-ebs" "minecraft" {
-  ami_name      = "minecraft"
+source "amazon-ebs" "minecraft-gameserver" {
+  ami_name      = "minecraft-gameserver"
   instance_type = "t4g.large"
   region        = "us-east-1"
 
@@ -19,9 +19,9 @@ source "amazon-ebs" "minecraft" {
 }
 
 build {
-  name = "minecraft-fabric-server"
+  name = "minecraft-gameserver"
   sources = [
-    "source.amazon-ebs.minecraft"
+    "source.amazon-ebs.minecraft-gameserver"
   ]
 
   provisioner "shell" {
