@@ -1,0 +1,70 @@
+bind = "0.0.0.0:25566"
+# Welcome message sent to players after spawning
+welcome_message = "Type /server coop to start playing, it make take a few minutes for the server to start up if no one has been online in the last 20 minutes."
+action_bar = "COOP Limbo"
+
+# Sets the game mode for new players
+# Allowed values: "survival", "creative", "adventure", or "spectator"
+default_game_mode = "spectator"
+
+reduced_debug_info = false
+allow_unsupported_versions = false
+allow_flight = false
+
+[forwarding]
+# Disable forwarding
+method = "MODERN"
+secret = "coop"
+
+[world]
+spawn_position = [0.0, 320.0, 0.0]
+spawn_rotation = [0.0, 0.0]
+dimension = "overworld"
+time = "day"
+
+[world.experimental]
+view_distance = 2
+# Path to schematic file for custom world structures
+schematic_file = ""
+lock_time = true
+
+[world.boundaries]
+enabled = true
+min_y = -64
+# Message displayed when a player reaches the minimum Y position
+teleport_message = "<red>You have reached the bottom of the world.</red>"
+
+[server_list]
+reply_to_status = true
+max_players = 1000
+message_of_the_day = "COOP Limbo Server"
+show_online_player_count = true
+server_icon = ""
+
+[compression]
+threshold = -1
+level = 6
+
+[tab_list]
+enabled = false
+player_listed = true
+
+[boss_bar]
+enabled = false
+title = "<bold>Type /servers to join</bold>"
+health = 1.0
+color = "white"
+division = 0
+
+[title]
+enabled = false
+title = "<bold>The main server is not online right now</bold>"
+subtitle = "/servers to start it"
+fade_in = 10
+stay = 70
+fade_out = 20
+
+[commands]
+spawn = ""
+fly = ""
+fly_speed = ""
