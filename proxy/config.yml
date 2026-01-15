@@ -1,4 +1,9 @@
 config:
+  bind: 0.0.0.0:25565
+  servers:
+    limbo: localhost:25566
   forwarding:
     mode: velocity
     velocitySecret: coop
+  try:
+    - limbo
