@@ -6,7 +6,7 @@ resource "aws_instance" "proxy" {
   # Nushell command to deregister previous AMI if needed (THIS DOESN'T DELETE SNAPSHOTS):
   # ^aws --region us-east-1 ec2 deregister-image --image-id (^aws --region us-east-1 ec2 describe-images --filters Name=name,Values=minecraft-proxy | from json | get Images | first | get ImageId)
   # Minecraft Proxy AMI built with Packer, See: ./ami/aws-proxy.pkr.hcl
-  ami = "ami-01943ce00e14af4e1"
+  ami = "ami-0c7133eb68930b0bc"
 
   user_data = <<-EOF
   #cloud-config
