@@ -50,7 +50,7 @@ STATE_DEVICE_NAME="/dev/sdf"
 SERVER_DIR="/home/${APPLICATION_USER}/minecraft"
 STATE_DIR="/home/${APPLICATION_USER}/mcstate"
 
-MINECRAFT_VERSION="1.21.1"
+MINECRAFT_VERSION="1.21.11"
 FABRIC_INSTALLER_VERSION="1.1.1"
 FABRIC_INSTALLER_JAR_CHECKSUM="2487a69dd6f9d9c2605265a7142d77c26ab62edc620e6bcf810d581d2ee31b79"
 
@@ -253,22 +253,14 @@ sudo chmod +x /usr/local/bin/rcon
 
 # Now for modifications!
 
-# Not yet setup
-# download_mod "https://cdn.modrinth.com/data/PFb7ZqK6/versions/DJbC2aUl/squaremap-fabric-mc1.21.1-1.2.7.jar" "d8b06c000a7d1701deef44effab230d0810300f8b6daeeb01033d2f1d98fc06b"
-# Disabled because of crash, cba to debug atm.
-# download_mod "https://cdn.modrinth.com/data/gvQqBUqZ/versions/5szYtenV/lithium-fabric-mc1.21.1-0.13.0.jar" "10d371fee397bf0306e1e2d863c54c56442bcc2dc6e01603f1469f2fe4910d61"
-
-download_mod "https://cdn.modrinth.com/data/P7dR8mSH/versions/qKPgBeHl/fabric-api-0.104.0%2B1.21.1.jar" "b1aeaf90a9af7b5fd4069147bfb8b5bd4c66e4756248ae12fed776e2da694a1a"
-download_mod "https://cdn.modrinth.com/data/KOHu7RCS/versions/Kxy5mXbm/Moonrise-Fabric-0.1.0-beta.2%2B44f8058.jar" "dfee191fbb525d0af10893aff55da02ee96e91d9e337b9eca75dc9724679a4b5"
-download_mod "https://cdn.modrinth.com/data/fALzjamp/versions/dPliWter/Chunky-1.4.16.jar" "c9f03e322e631ee94ccb8dbf3776859cd12766e513b7533e9f966e799db47937"
-download_mod "https://cdn.modrinth.com/data/s86X568j/versions/uT1cdd3k/ChunkyBorder-1.2.18.jar" "0a4066b36603e1d91fe7d11cce8e2eb066c668828889c866ce08d1baf469f351"
+download_mod "https://cdn.modrinth.com/data/P7dR8mSH/versions/DdVHbeR1/fabric-api-0.141.1%2B1.21.11.jar" "6a577f83bd8b33c9404127d16531acc9c4195f47de0395957c9d4cd09d7b98c6"
 # SEE: https://download.geysermc.org/v2/projects/geyser/versions/latest for a list of versions
 # SEE: https://github.com/GeyserMC/GeyserWebsite/blob/master/openapi/downloads.json for API spec
 # Geyser returns a UTF8 filename content-disposition header, which is not supported by curl, we need to manually specifiy the filename here.
-download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/builds/676/downloads/fabric" "cfb15ad7c1b938af8ad96554d2764549f66899262cc3579fdcdbc94bcc5400a5" "Geyser-Fabric.jar"
-download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
-download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/l47d4ZWk/LuckPerms-Fabric-5.4.140.jar" "3e17d490f87761c174478f68860367610a473ff5c2a9a9daad608773bf0e81bc"
-download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/KqB3UA0q/FabricProxy-Lite-2.10.1.jar" "36737b62c7a5dfb679ac3fac6a7db10f9a423317fba19574bc4d472b4711c742"
+# download_mod "https://download.geysermc.org/v2/projects/geyser/versions/2.4.3/builds/676/downloads/fabric" "cfb15ad7c1b938af8ad96554d2764549f66899262cc3579fdcdbc94bcc5400a5" "Geyser-Fabric.jar"
+# download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
+download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/CzCJJMuo/LuckPerms-Fabric-5.5.21.jar" "98db2f98bbdab74a36c74e8b42e5f5f15e6991051f4a2a55f4ddab4a10ce1304"
+download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/nR8AIdvx/FabricProxy-Lite-2.11.0.jar" "ebc7abeaf6c03ac619c701ebb332de6966c6d83edfabf02434720c8fc3d03cdc"
 
 # TODO, first systemd oneshot fails because the server isn't running yet.
 # `Jan 13 22:11:21 ip-172-31-25-83.ec2.internal push_player_count.sh[1983]: RCON response line: 'error while trying to connect: dial tcp 127.0.0.1:50323: connect: >`
