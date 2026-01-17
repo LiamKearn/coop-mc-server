@@ -1,6 +1,6 @@
 bind = "0.0.0.0:25566"
 # Welcome message sent to players after spawning
-welcome_message = "Type /server coop to start playing, it make take a few minutes for the server to start up if no one has been online in the last 20 minutes. If it says unable to connect, try again in a minute or two."
+welcome_message = "Welcome the COOP Limbo Server! Feel free to fly around, there is nothing here it's just a lightweight waiting server that is cost effective while the main servers hibernate."
 action_bar = "COOP Limbo"
 
 # Sets the game mode for new players

@@ -23,6 +23,7 @@ resource "aws_iam_role_policy_attachment" "proxy_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedEC2InstanceDefaultPolicy"
 }
 
+// TODO: I should really limit these permissions more..
 resource "aws_iam_role_policy" "proxy" {
   role = aws_iam_role.proxy.id
 
@@ -42,7 +43,12 @@ resource "aws_iam_role_policy" "proxy" {
           "ec2:DescribeInstances"
         ]
         Resource = "*"
-      }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
+      },
     ]
   })
 }
