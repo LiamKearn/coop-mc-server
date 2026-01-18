@@ -45,7 +45,7 @@ download_mod() {
 # ========================================================
 
 APPLICATION_USER="mcuser"
-STATE_DEVICE_NAME="/dev/sdf"
+STATE_DEVICE_PATH="/dev/sdf"
 
 SERVER_DIR="/home/${APPLICATION_USER}/minecraft"
 STATE_DIR="/home/${APPLICATION_USER}/mcstate"
@@ -192,8 +192,8 @@ After=local-fs.target
 After=dev-sdf.device
 
 [Mount]
-What=/dev/sdf
-Where=/home/mcuser/mcstate
+What=${STATE_DEVICE_PATH}
+Where=${STATE_DIR}
 Type=ext4
 Options=defaults,nofail
 
