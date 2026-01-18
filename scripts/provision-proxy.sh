@@ -2,6 +2,29 @@
 set -xe
 
 # ========================================================
+# START FUNCTIONS
+# ========================================================
+
+check_the_sum() {
+    FILE=$1
+    EXPECTED=$2
+    ACTUAL=$(sha256sum "${FILE}" | cut -d ' ' -f 1)
+    echo "Checking the of ${FILE}"
+    echo "Expected: ${EXPECTED}"
+    echo "Actual: ${ACTUAL}"
+    if [ "$EXPECTED" != "$ACTUAL" ]; then
+        echo "Checksum of ${FILE} does not match expected checksum, exiting"
+        rm -f "${FILE}"
+        exit 1
+    fi
+    echo "Checksum matches!"
+}
+
+# ========================================================
+# END FUNCTIONS
+# ========================================================
+
+# ========================================================
 # START VARIABLES
 # ========================================================
 
@@ -20,6 +43,7 @@ sudo adduser "${APPLICATION_USER}"
 sudo chown ec2-user:ec2-user "/home/${APPLICATION_USER}"
 
 sudo curl -o pico.tar.gz -L "https://github.com/Quozul/PicoLimbo/releases/download/v1.10.1%2Bmc1.21.11/pico_limbo_linux-aarch64-gnu.tar.gz"
+check_the_sum pico.tar.gz "c6a7681b11a4d0b1e33720c16ab0003eeaaa81aa227cf58305832bd7a973f99d"
 sudo tar -xzf pico.tar.gz
 sudo rm pico.tar.gz
 sudo mv pico_limbo "/home/${APPLICATION_USER}/limbo"
