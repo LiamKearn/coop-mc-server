@@ -99,7 +99,6 @@ func NewEggpressPlugin(targetInstanceId string, targetInstancePrivateIp net.Addr
 }
 
 func (e *Eggpress) onLogin(event *proxy.LoginEvent) {
-
 	// TODO: Whitelist functionality, maybe via AWS DynamoDB or something? Needs
 	// to be sync between this proxy and the gameserver itself.
 	//
