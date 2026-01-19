@@ -261,6 +261,8 @@ download_mod "https://cdn.modrinth.com/data/P7dR8mSH/versions/DdVHbeR1/fabric-ap
 # download_mod "https://cdn.modrinth.com/data/bWrNNfkb/versions/wPa1pHZJ/Floodgate-Fabric-2.2.4-b36.jar" "89fcd6add678289a10a45b2976198e43e149b7054c686b5fcb85d039c7b05746"
 download_mod "https://cdn.modrinth.com/data/Vebnzrzj/versions/CzCJJMuo/LuckPerms-Fabric-5.5.21.jar" "98db2f98bbdab74a36c74e8b42e5f5f15e6991051f4a2a55f4ddab4a10ce1304"
 download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/nR8AIdvx/FabricProxy-Lite-2.11.0.jar" "ebc7abeaf6c03ac619c701ebb332de6966c6d83edfabf02434720c8fc3d03cdc"
+download_mod "https://cdn.modrinth.com/data/fdZkP5Bb/versions/hA27RLKS/vanilla-permissions-0.3.3%2B1.21.11.jar" "95fa72dcd5076b53d84c9d3ecd2c637b2cc5f3b61970eab4517ca4737c95438a"
+download_mod "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar" "3106639c73ee23f44bfbe5e5e7a8154dfe3ad0fd48491e4a85767598ed7b0739"
 
 # TODO, first systemd oneshot fails because the server isn't running yet.
 # `Jan 13 22:11:21 ip-172-31-25-83.ec2.internal push_player_count.sh[1983]: RCON response line: 'error while trying to connect: dial tcp 127.0.0.1:50323: connect: >`
