@@ -82,6 +82,7 @@ resource "aws_vpc_security_group_ingress_rule" "proxy_bedrock" {
 }
 
 # TODO: This should be exgress to ONLY the gameserver SG AND mojang authentcation servers
+# (and also AWS metadata, SSM, etc)
 resource "aws_vpc_security_group_egress_rule" "proxy_all" {
   security_group_id = aws_security_group.proxy.id
   cidr_ipv4         = "0.0.0.0/0"
