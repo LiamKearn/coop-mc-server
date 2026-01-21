@@ -34,8 +34,13 @@ build {
   }
 
   provisioner "file" {
-    source      = "proxy/config.yml"
+    source      = "proxy/gateconfig.yml"
     destination = "/home/proxy/config.yml"
+  }
+
+  provisioner "file" {
+    source      = "proxy/geyserconfig.yml"
+    destination = "/home/proxy/geyser/config.yml"
   }
 
   provisioner "file" {
@@ -46,6 +51,7 @@ build {
   provisioner "shell" {
     inline = [
       "sudo chown proxy:proxy /home/proxy",
+      "sudo chown proxy:proxy /home/proxy/geyser",
       "sudo chmod u+x /home/proxy/proxy",
       "sudo chown proxy /home/proxy/proxy"
     ]
