@@ -115,7 +115,7 @@ EOF
 
 sudo tee "${SERVER_DIR}/server.properties" <<EOF
 accepts-transfers=false
-allow-flight=false
+allow-flight=true
 allow-nether=true
 broadcast-console-to-ops=true
 broadcast-rcon-to-ops=true
