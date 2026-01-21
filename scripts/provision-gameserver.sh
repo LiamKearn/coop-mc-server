@@ -175,7 +175,7 @@ spawn-protection=0
 sync-chunk-writes=true
 text-filtering-config=
 use-native-transport=true
-view-distance=16
+view-distance=20
 white-list=true
 EOF
 # Something seems to want to access this, which is odd? Hasn't created any
