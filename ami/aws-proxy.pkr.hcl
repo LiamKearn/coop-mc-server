@@ -39,19 +39,13 @@ build {
   }
 
   provisioner "file" {
-    source      = "proxy/geyserconfig.yml"
-    destination = "/home/proxy/geyser/config.yml"
-  }
-
-  provisioner "file" {
-    source      = "proxy/server.toml"
+    source      = "proxy/picolimboconfig.toml"
     destination = "/home/proxy/server.toml"
   }
 
   provisioner "shell" {
     inline = [
       "sudo chown proxy:proxy /home/proxy",
-      "sudo chown proxy:proxy /home/proxy/geyser",
       "sudo chmod u+x /home/proxy/proxy",
       "sudo chown proxy /home/proxy/proxy"
     ]

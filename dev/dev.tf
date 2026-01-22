@@ -20,5 +20,4 @@ module "minecraft" {
   personal_email_address = var.personal_email_address
   minecraft_ip_address = var.minecraft_ip_address
   minecraft_state_volume_id = var.minecraft_state_volume_id
-  minecraft_floodgate_key_secret_arn = var.minecraft_floodgate_key_secret_arn
 }

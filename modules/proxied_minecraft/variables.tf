@@ -30,8 +30,3 @@ variable "minecraft_state_volume_id" {
   description = "Minecraft state volume ID"
   type        = string
 }
-
-variable "minecraft_floodgate_key_secret_arn" {
-  description = "ARN of the Secrets Manager secret containing the Floodgate key"
-  type        = string
-}

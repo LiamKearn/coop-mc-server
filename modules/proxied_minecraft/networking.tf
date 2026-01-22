@@ -73,14 +73,6 @@ resource "aws_vpc_security_group_ingress_rule" "proxy_java" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "proxy_bedrock" {
-  security_group_id = aws_security_group.proxy.id
-  from_port         = 19132
-  to_port           = 19132
-  ip_protocol       = "udp"
-  cidr_ipv4         = "0.0.0.0/0"
-}
-
 # TODO: This should be exgress to ONLY the gameserver SG AND mojang authentcation servers
 # (and also AWS metadata, SSM, etc)
 resource "aws_vpc_security_group_egress_rule" "proxy_all" {
@@ -94,14 +86,6 @@ resource "aws_vpc_security_group_ingress_rule" "java_from_proxy" {
   from_port                    = 25565
   to_port                      = 25565
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.proxy.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "bedrock_from_proxy" {
-  security_group_id            = aws_security_group.gameserver.id
-  from_port                    = 19132
-  to_port                      = 19132
-  ip_protocol                  = "udp"
   referenced_security_group_id = aws_security_group.proxy.id
 }
 

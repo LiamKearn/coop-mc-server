@@ -6,17 +6,11 @@ resource "aws_instance" "proxy" {
   # Nushell command to deregister previous AMI if needed (THIS DOESN'T DELETE SNAPSHOTS):
   # ^aws --region us-east-1 ec2 deregister-image --image-id (^aws --region us-east-1 ec2 describe-images --filters Name=name,Values=minecraft-proxy | from json | get Images | first | get ImageId)
   # Minecraft Proxy AMI built with Packer, See: ./ami/aws-proxy.pkr.hcl
-  ami = "ami-01d0ae0a7b7c21399"
+  ami = "ami-00400e31c78c77d84"
 
   user_data = <<-EOF
   #cloud-config
   write_files:
-    - path: /run/secrets/floodgate
-      owner: proxy:proxy
-      permissions: '0400'
-      encoding: b64
-      content: |
-        ${base64encode(data.aws_secretsmanager_secret_version.floodgate_key_latest.secret_binary)}
     - path: /home/proxy/proxy.env
       owner: proxy:proxy
       permissions: '0644'
@@ -25,8 +19,7 @@ resource "aws_instance" "proxy" {
         TARGET_EC2_INSTANCE_PRIVATE_IP=${aws_instance.gameserver.private_ip}
   EOF
 
-  # instance_type = "t4g.nano"
-  instance_type = "t4g.micro"
+  instance_type = "t4g.nano"
 
   iam_instance_profile = aws_iam_instance_profile.proxy.name
 

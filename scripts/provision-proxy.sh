@@ -32,19 +32,12 @@ APPLICATION_USER="proxy"
 
 SYSTEMD_PROXY_SERVICE="proxy.service"
 SYSTEMD_LIMBO_SERVICE="limbo.service"
-SYSTEMD_GEYSER_SERVICE="geyser.service"
 
 SERVER_DIR="/home/${APPLICATION_USER}"
-GEYSER_DIR="${SERVER_DIR}/geyser"
 
 # ========================================================
 # END VARIABLES
 # ========================================================
-
-# Install Amazon's java runtime early in the background since it takes ages
-sudo yum install -y java-21-amazon-corretto-headless &
-JAVA_INSTALL_PID=$!
-
 
 # Create a application user
 sudo adduser "${APPLICATION_USER}"
@@ -96,8 +89,6 @@ Description=Minecraft Proxy Server
 After=${SYSTEMD_LIMBO_SERVICE}
 Requires=${SYSTEMD_LIMBO_SERVICE}
 After=network.target
-After=cloud-init.target
-Wants=cloud-init.target
 
 [Service]
 Type=simple
@@ -124,48 +115,4 @@ EOF
 sudo ln -sf \
   "/etc/systemd/system/${SYSTEMD_PROXY_SERVICE}" \
   "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_PROXY_SERVICE}"
-
-sudo mkdir -p "${GEYSER_DIR}"
-# Just for provisioning, will be changed later in provisioning
-sudo chown ec2-user:ec2-user "${GEYSER_DIR}"
-sudo curl -o ${GEYSER_DIR}/geyser.jar -L "https://download.geysermc.org/v2/projects/geyser/versions/2.9.2/builds/1037/downloads/standalone"
-check_the_sum ${GEYSER_DIR}/geyser.jar "adec02767b4e84c3b47d7124ed26e3c18f05b4565812e5617b9be83d92721a9f"
-
-sudo tee "/etc/systemd/system/${SYSTEMD_GEYSER_SERVICE}" <<EOF
-[Unit]
-Description=Geyser Proxy Service
-Requires=${SYSTEMD_PROXY_SERVICE}
-After=${SYSTEMD_PROXY_SERVICE}
-After=network.target
-
-[Service]
-Type=simple
-User=${APPLICATION_USER}
-Group=${APPLICATION_USER}
-
-WorkingDirectory=${GEYSER_DIR}
-ExecStart=java -Xms1024M -jar ${GEYSER_DIR}/geyser.jar
-
-StandardOutput=journal
-StandardError=journal
-
-KillSignal=SIGTERM
-TimeoutStopSec=60
-# MC is a JVM process, which can 143 on SIGTERM
-SuccessExitStatus=143
-
-Restart=always
-RestartSec=5
-
-LimitNOFILE=100000
-
-[Install]
-WantedBy=multi-user.target
-EOF
-sudo mkdir -p /etc/systemd/system/multi-user.target.wants
-sudo ln -sf \
-  "/etc/systemd/system/${SYSTEMD_GEYSER_SERVICE}" \
-  "/etc/systemd/system/multi-user.target.wants/${SYSTEMD_GEYSER_SERVICE}"
-
-wait $JAVA_INSTALL_PID
 
