@@ -145,9 +145,7 @@ log-ips=true
 max-chained-neighbor-updates=1000000
 max-players=67
 max-tick-time=60000
-# https://minecraft.fandom.com/wiki/Server.properties
-# Setting max-world-size to 4000 gives the player an 8000×8000 world border.
-max-world-size=4000
+max-world-size=29999984
 motd=The COOP Minecraft Server!
 network-compression-threshold=256
 online-mode=true
