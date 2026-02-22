@@ -257,6 +257,7 @@ download_mod "https://cdn.modrinth.com/data/8dI2tmqs/versions/nR8AIdvx/FabricPro
 download_mod "https://cdn.modrinth.com/data/fdZkP5Bb/versions/hA27RLKS/vanilla-permissions-0.3.3%2B1.21.11.jar" "95fa72dcd5076b53d84c9d3ecd2c637b2cc5f3b61970eab4517ca4737c95438a"
 download_mod "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar" "3106639c73ee23f44bfbe5e5e7a8154dfe3ad0fd48491e4a85767598ed7b0739"
 download_mod "https://cdn.modrinth.com/data/zQhsx8KF/versions/RyZYsN9V/servux-fabric-1.21.11-0.9.1.jar" "b2124f6509f0d52bc2bb32cbfe7ffae0372dd6ff2813f16a483ac3c987a636ba"
+download_mod "https://cdn.modrinth.com/data/TQTTVgYE/versions/HzPcczDK/fabric-carpet-1.21.11-1.4.194%2Bv251223.jar" "1b4d66f0332bda5deee08755e493c2d6ac64d64d5285e1134aa03604975c2521"
 
 # TODO, first systemd oneshot fails because the server isn't running yet.
 # `Jan 13 22:11:21 ip-172-31-25-83.ec2.internal push_player_count.sh[1983]: RCON response line: 'error while trying to connect: dial tcp 127.0.0.1:50323: connect: >`
